@@ -1,0 +1,52 @@
+# Training loop configuration.
+
+experiment:
+  name: experiment_001
+  output_dir: experiments/experiment_001
+  seed: 42
+
+data:
+  train_path: data/final/train.jsonl
+  val_path: data/final/val.jsonl
+  num_workers: 4
+  prefetch_factor: 2
+
+training:
+  batch_size: 64
+  gradient_accumulation_steps: 4
+  num_epochs: 10
+  max_steps: null              # null = run full epochs
+  mixed_precision: bf16        # fp32 | fp16 | bf16
+
+optimizer:
+  type: adamw
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  max_grad_norm: 1.0
+
+scheduler:
+  type: cosine
+  warmup_steps: 1000
+  min_lr_ratio: 0.1
+
+loss:
+  type: infonce                 # infonce | triplet | mnrl — see docs/Decisions.md DEC-004
+  temperature: 0.05
+  in_batch_negatives: true
+
+checkpoint:
+  interval_steps: 1000
+  keep_last: 3
+  save_best: true
+  best_metric: val_loss
+
+evaluation:
+  interval_steps: 500
+  config: configs/eval.yaml
+
+logging:
+  log_interval_steps: 100
+  wandb: false
+  tensorboard: true

@@ -1,48 +1,79 @@
 # Design
 
-Defines design principles and style for maintainable implementation.
+Principles and design approach for tiny-embed.
 
-## 1) Design principles
+## Goals
 
-- Keep solutions simple and explicit.
-- Separate domain logic from transport/infrastructure.
-- Favor composition over inheritance when practical.
-- Keep side-effects at boundaries.
-- Make invalid states hard to represent.
+- Build a competitive text embedding model from scratch.
+- Keep data engineering, model code, training, and inference cleanly separated.
+- Support custom CUDA kernels without coupling them to model architecture.
+- Make every experiment reproducible and every decision traceable.
 
-## 2) Design constraints
+## Design principles
 
-- Performance expectations:
-- Security expectations:
-- Reliability expectations:
-- Backward compatibility policy:
+### 1. Separation of concerns
 
-## 3) Interface design
+Each `src/` module owns exactly one phase of the pipeline. Cross-module imports follow the data flow direction: `dataset` -> `training` -> `evaluation` / `inference`. `src/model/` is imported by `src/training/` and `src/inference/` but never the reverse.
 
-- Clear input/output contracts.
-- Validation at boundaries.
-- Stable response/error schema.
-- Versioning and compatibility strategy.
+### 2. Configuration over code
 
-## 4) Data design
+Hyperparameters, paths, and runtime settings live in `configs/*.yaml`. Code reads config at startup. Changing a learning rate never requires a code change.
 
-- Canonical entities and identifiers.
-- Mutation and consistency rules.
-- Auditability requirements.
+### 3. PyTorch first, CUDA second
 
-## 5) Error and resilience design
+Every operation in `src/model/` has a pure PyTorch implementation. CUDA kernels in `src/cuda/` are drop-in replacements optimized for inference. Training always uses PyTorch; inference can opt into CUDA.
 
-- Error taxonomy and mapping strategy.
-- Retry/idempotency policy.
-- Timeout and circuit-breaker policy.
+### 4. Fail loud, log everything
 
-## 6) Testing design
+Training metrics, evaluation scores, and benchmark results are written to disk in structured format. Silent failures are not acceptable.
 
-- Unit tests for domain behavior.
-- Integration tests for adapters and boundaries.
-- Contract tests for external dependencies.
-- End-to-end tests for critical journeys.
+### 5. Document before you build
 
-## 7) Link to reusable patterns
+Major architectural choices go into `Decisions.md` before implementation begins. The cost of a wrong abstraction is higher than the cost of a short design discussion.
 
-Implementation patterns are documented in `Patterns.md`.
+## Model design (placeholder)
+
+Fill in as decisions are made:
+
+- **Architecture**: Encoder-only transformer (details TBD)
+- **Attention**: TBD (MLA vs MHA — see `Decisions.md`)
+- **Pooling**: TBD (mean, CLS, last-token)
+- **Loss**: TBD (contrastive, InfoNCE, triplet)
+- **Tokenizer**: TBD (SentencePiece vs BPE — see `Decisions.md`)
+
+## Interface contracts
+
+### Model output
+
+The encoder produces a fixed-dimensional embedding vector per input sequence:
+
+```
+input_ids:  [batch, seq_len]
+attention_mask: [batch, seq_len]
+--> embeddings: [batch, embed_dim]
+```
+
+### Checkpoint format
+
+```
+checkpoint/
+  model.safetensors
+  config.json
+  tokenizer.model
+  training_state.pt  (optional, for resume)
+```
+
+### Inference API
+
+```
+POST /embed
+  body: { "texts": ["...", "..."] }
+  response: { "embeddings": [[...], [...]], "dim": 768 }
+```
+
+## What not to do
+
+- Do not put training loops in `src/model/`.
+- Do not hardcode paths or hyperparameters in Python files.
+- Do not store experiment results outside `experiments/`.
+- Do not merge CUDA kernel code into `src/model/` — keep it in `src/cuda/`.

@@ -1,0 +1,34 @@
+services:
+  inference:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    image: tiny-embed:latest
+    ports:
+      - "${TINYEMBED_PORT:-8000}:8000"
+    environment:
+      TINYEMBED_MODEL_PATH: ${TINYEMBED_MODEL_PATH:-deployment/export}
+      TINYEMBED_PORT: ${TINYEMBED_PORT:-8000}
+      TINYEMBED_DEVICE: ${TINYEMBED_DEVICE:-cpu}
+      TINYEMBED_QUANTIZATION: ${TINYEMBED_QUANTIZATION:-none}
+      TINYEMBED_CUDA_KERNELS: ${TINYEMBED_CUDA_KERNELS:-false}
+      TINYEMBED_MAX_BATCH_SIZE: ${TINYEMBED_MAX_BATCH_SIZE:-32}
+      TINYEMBED_MAX_SEQ_LENGTH: ${TINYEMBED_MAX_SEQ_LENGTH:-512}
+    volumes:
+      - ../deployment/export:/app/deployment/export:ro
+      - ../configs/inference.yaml:/app/configs/inference.yaml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  # Uncomment when Prometheus/Grafana monitoring is added.
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro

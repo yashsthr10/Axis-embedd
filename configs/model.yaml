@@ -1,0 +1,26 @@
+# Model architecture configuration.
+# All dimensions and structural choices live here — never hardcode in src/model/.
+
+name: tiny-embed-v1
+
+architecture:
+  type: encoder
+  num_layers: 12
+  hidden_dim: 768
+  num_heads: 12
+  intermediate_dim: 3072
+  attention_type: mha          # mha | mla — see docs/Decisions.md DEC-001
+  activation: swiglu
+  norm: rmsnorm
+  position_encoding: rope
+  max_seq_length: 512
+  vocab_size: 32000            # must match configs/tokenizer.yaml
+
+embedding:
+  embed_dim: 768
+  pooling: mean                # mean | cls | last — see docs/Decisions.md DEC-005
+  normalize: true
+  projection_dim: null         # null = no projection, or set e.g. 256
+
+dropout: 0.1
+tie_word_embeddings: false

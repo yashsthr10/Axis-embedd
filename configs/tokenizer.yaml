@@ -1,0 +1,28 @@
+# Tokenizer training and export configuration.
+
+algorithm: sentencepiece       # sentencepiece | bpe — see docs/Decisions.md DEC-002
+model_type: bpe                # unigram | bpe | char | word
+vocab_size: 32000
+
+corpus:
+  path: data/final/train.txt
+  sample_size: null            # null = use full corpus
+
+special_tokens:
+  pad: "<pad>"
+  unk: "<unk>"
+  bos: "<s>"
+  eos: "</s>"
+
+training:
+  character_coverage: 0.9995
+  byte_fallback: true
+  num_threads: 8
+  max_sentence_length: 4192
+  shuffle_input_sentence: true
+
+output:
+  dir: experiments/tokenizer
+  model_file: tokenizer.model
+  vocab_file: tokenizer.vocab
+  export_json: tokenizer.json

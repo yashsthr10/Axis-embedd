@@ -1,0 +1,44 @@
+# Data artifacts (large, never commit)
+data/raw/**
+data/cleaned/**
+data/deduped/**
+data/processed/**
+data/pairs/**
+data/final/**
+
+# Experiment artifacts
+experiments/**/checkpoints/
+experiments/**/logs/
+
+# Notebook outputs
+notebooks/**/*.ipynb_checkpoints/
+notebooks/**/output/
+
+# Deployment exports
+deployment/export/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+
+# CUDA build artifacts
+src/cuda/**/build/
+src/cuda/**/*.so
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Build
+build/
+dist/
+*.egg-info/
+.venv/
