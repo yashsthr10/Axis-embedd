@@ -7,6 +7,10 @@ Storage for raw and intermediate data artifacts. This folder holds data; process
 ```
 data/
   raw/           Original downloads — never modify in place
+                 documents.jsonl, manifest.json
+  cleaned/       Output of dataset/clean/ (HTML stripped, normalized)
+  deduped/       Output of dataset/dedupe/ (exact duplicates removed)
+  processed/     stats.json from length analysis and inspection
   cleaned/       Output of dataset/clean/
   deduped/       Output of dataset/dedupe/
   processed/     Output of dataset/preprocess/

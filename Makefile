@@ -41,7 +41,10 @@ setup: ## Create virtualenv and install all dependencies
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -e ".[dev]"
+	$(PIP) install -r requirements-dev.txt
+	$(PY) -m ipykernel install --user --name=tiny-embed --display-name="Python (tiny-embed)"
 	@echo "Setup complete. Activate with: source $(VENV)/bin/activate"
+	@echo "Notebook kernel: Python (tiny-embed)"
 
 install: ## Install production dependencies only
 	$(PIP) install -e .
@@ -77,6 +80,12 @@ benchmark: ## Run inference benchmarks
 
 tokenize: ## Train tokenizer
 	$(PY) -m tokenizer.train --config $(TOKEN_CONFIG)
+
+fetch: ## Fetch raw data from Common Crawl
+	$(PY) scripts/fetch_data.py
+
+preprocess: ## Inspect, clean, dedupe, and analyze raw data
+	$(PY) scripts/preprocess_data.py
 
 # ---------------------------------------------------------------------------
 # Quality

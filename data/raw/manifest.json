@@ -1,0 +1,26 @@
+{
+  "source": "commoncrawl",
+  "crawl_id": "CC-MAIN-2024-46",
+  "crawl_name": "November 2024 Index",
+  "fetched_at": "2026-06-10T18:10:41.956914+00:00",
+  "wet_files_requested": 2,
+  "wet_files_used": [
+    "crawl-data/CC-MAIN-2024-46/segments/1730477028545.2/wet/CC-MAIN-20241114062951-20241114092951-00110.warc.wet.gz",
+    "crawl-data/CC-MAIN-2024-46/segments/1730477027796.35/wet/CC-MAIN-20241103212031-20241104002031-00192.warc.wet.gz"
+  ],
+  "max_records": 500000,
+  "records_written": 56436,
+  "min_text_chars": 200,
+  "output_file": "data/raw/documents.jsonl",
+  "format": "jsonl",
+  "fields": [
+    "id",
+    "warc_record_id",
+    "url",
+    "crawl_id",
+    "wet_file",
+    "text",
+    "char_count"
+  ],
+  "license": "https://commoncrawl.org/terms-of-use"
+}
