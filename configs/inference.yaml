@@ -1,0 +1,28 @@
+# Inference and serving configuration.
+
+model:
+  path: deployment/export
+  name: tiny-embed-v1
+  device: cuda                 # cuda | cpu
+  dtype: float16               # float32 | float16 | bfloat16
+
+runtime:
+  use_cuda_kernels: false      # see docs/Decisions.md DEC-003
+  quantization: none           # none | int8 | int4
+  compile: false               # torch.compile (experimental)
+
+batching:
+  max_batch_size: 32
+  max_seq_length: 512
+  dynamic_batching: true
+  batch_timeout_ms: 10
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  log_level: info
+
+output:
+  normalize: true
+  return_dtype: float32

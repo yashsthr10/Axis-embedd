@@ -1,53 +1,96 @@
-# Repository Documentation System
+# tiny-embed
 
-This repository is a reusable documentation framework for software projects.
-It is designed so both humans and AI coding agents can quickly understand intent, constraints, and implementation style.
+End-to-end repository for building a text embedding model from scratch.
 
-## Why this exists
+## Pipeline
 
-- Reduce repeated architecture/process questions.
-- Keep decisions and rules explicit.
-- Make new contributors productive quickly.
-- Improve consistency across repositories.
+```
+Raw Text
+     |
+     v
+Tokenizer
+     |
+     v
+Dataset
+     |
+     v
+Training
+     |
+     v
+Embedding Model
+     |
+     v
+Evaluation
+     |
+     v
+CUDA Inference
+```
 
-## Start here
+## Layout
 
-Read these files in order:
+| Path | Purpose | Owner |
+|------|---------|-------|
+| `docs/` | Architecture, design, decisions, roadmap | Friend |
+| `configs/` | All hyperparameters and runtime settings | Shared |
+| `data/` | Raw and intermediate data artifacts | Shared |
+| `src/tokenizer/` | Vocabulary training and export | Friend |
+| `src/dataset/` | Crawl, clean, dedupe, preprocess, pair generation | Friend |
+| `src/model/` | Encoder architecture and building blocks | You |
+| `src/training/` | Trainer, losses, optimizer, checkpoints | You |
+| `src/evaluation/` | Retrieval, similarity, MTEB benchmarks | Shared |
+| `src/inference/` | Runtime engine, quantization, server | You |
+| `src/cuda/` | Custom GPU kernels | You |
+| `scripts/` | One-off and operational scripts | Shared |
+| `tests/` | Unit and integration tests | Friend |
+| `benchmarks/` | Latency, throughput, memory, retrieval | Shared |
+| `experiments/` | Per-run configs, results, notes | Shared |
+| `notebooks/` | Exploratory analysis | Shared |
+| `deployment/` | Packaging and serving infrastructure | Shared |
 
-1. `docs/RepositoryGuide.md`
-2. `docs/Architecture.md`
-3. `docs/Structure.md`
-4. `docs/Rules.md`
-5. `docs/Workflow.md`
+## Getting started
 
-## Documentation map
+1. Read `docs/Architecture.md` for the full system design.
+2. Read `docs/Decisions.md` before making major technical choices.
+3. Bootstrap the environment:
 
-- `docs/RepositoryGuide.md` - one-file onboarding guide.
-- `docs/SPECS.md` - what must be built and validated.
-- `docs/Architecture.md` - high-level component and boundary design.
-- `docs/Design.md` - principles and design approach.
-- `docs/LLD.md` - low-level implementation details.
-- `docs/Structure.md` - folder conventions and ownership boundaries.
-- `docs/Modules.md` - module map and responsibilities.
-- `docs/Codepath.md` - key execution and data flow paths.
-- `docs/Workflow.md` - branch, review, CI/CD, and release process.
-- `docs/Rules.md` - hard requirements that must be followed.
-- `docs/Conventions.md` - preferred style and team defaults.
-- `docs/Patterns.md` - recurring implementation patterns to reuse.
-- `docs/Decisions.md` - major technical decisions and rationale.
-- `docs/Dependencies.md` - internal and external dependency map.
-- `docs/Examples.md` - implementation examples and starter flows.
-- `docs/Glossary.md` - shared domain definitions.
-- `docs/FAQ.md` - commonly asked repo questions.
-- `docs/Changelog.md` - documentation/system change history.
+```bash
+./scripts/setup_env.sh
+# or
+make setup
+```
 
-## Usage in new repositories
+4. Copy and adjust environment variables:
 
-1. Copy this structure.
-2. Replace placeholders with project-specific details.
-3. Keep docs updated whenever behavior or architecture changes.
-4. Add new decisions and patterns before expanding implementation.
+```bash
+cp .env.example .env
+```
 
-## Maintenance rule
+## Makefile
 
-If code changes without corresponding documentation updates, consider the work incomplete.
+```bash
+make help          # list all targets
+make setup         # create venv and install deps
+make train         # run training
+make eval          # run evaluation
+make infer         # start inference server
+make export        # export checkpoint for deployment
+make test          # run tests
+make lint          # ruff lint
+make check         # lint + typecheck + test
+make docker-build  # build inference image
+make docker-up     # start server via docker compose
+```
+
+Override defaults via env vars or Make arguments:
+
+```bash
+make train EXPERIMENT=experiment_002 TRAIN_CONFIG=configs/train.yaml
+make eval CHECKPOINT=experiments/experiment_002/checkpoints/best
+```
+
+## Rules
+
+- Model code lives in `src/model/`. No training logic there.
+- Training code lives in `src/training/`. No model architecture there.
+- Every major choice (MLA vs MHA, SentencePiece vs BPE, INT8 vs INT4) goes in `docs/Decisions.md`.
+- Experiment results never leave `experiments/` — configs, graphs, and notes stay together.

@@ -1,0 +1,40 @@
+# Evaluation and benchmark configuration.
+
+checkpoint: experiments/experiment_001/checkpoints/best
+batch_size: 32
+device: cuda
+max_seq_length: 512
+
+suites:
+  retrieval: true
+  similarity: true
+  clustering: false
+  classification: false
+  mteb: true
+
+retrieval:
+  datasets:
+    - nfcorpus
+    - scifact
+  metrics:
+    - recall_at_1
+    - recall_at_5
+    - recall_at_10
+    - mrr
+    - ndcg_at_10
+
+similarity:
+  datasets:
+    - sts12
+    - sts22
+  metrics:
+    - spearman
+    - pearson
+
+mteb:
+  tasks: null                  # null = default MTEB suite, or list specific tasks
+  output_folder: experiments/experiment_001/eval/mteb
+
+output:
+  dir: experiments/experiment_001/eval
+  save_predictions: false

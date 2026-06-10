@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tiny-embed"
+version = "0.1.0"
+description = "Text embedding model built from scratch"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "tiny-embed contributors" }]
+
+dependencies = [
+    "torch>=2.1.0",
+    "safetensors>=0.4.0",
+    "sentencepiece>=0.2.0",
+    "transformers>=4.36.0",
+    "pyyaml>=6.0",
+    "numpy>=1.24.0",
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.5.0",
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.2.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+    "types-PyYAML>=6.0.0",
+]
+eval = [
+    "mteb>=1.1.0",
+    "scikit-learn>=1.3.0",
+]
+cuda = [
+    "ninja>=1.11.0",
+]
+all = [
+    "tiny-embed[dev,eval,cuda]",
+]
+
+[project.scripts]
+tiny-embed-train = "training.trainer:main"
+tiny-embed-serve = "inference.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "cuda: tests that require a CUDA GPU",
+    "slow: long-running integration tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests", "scripts", "benchmarks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["model", "training", "evaluation", "inference", "cuda", "tokenizer", "dataset"]
+
+[tool.mypy]
+python_version = "3.10"
+packages = ["model", "training", "evaluation", "inference", "cuda", "tokenizer", "dataset"]
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*", "src/cuda/*"]

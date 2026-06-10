@@ -4,32 +4,48 @@ High-level map of codebase modules and ownership.
 
 ## 1) Module catalog
 
-For each module:
+| Module | Path | Purpose | Owner |
+|--------|------|---------|-------|
+| Model | `src/model/` | Encoder architecture and building blocks | You |
+| Training | `src/training/` | Training loop, losses, optimizer, checkpoints | You |
+| Evaluation | `src/evaluation/` | Retrieval, similarity, MTEB benchmarks | Shared |
+| Inference | `src/inference/` | Runtime engine, quantization, HTTP server | You |
+| CUDA | `src/cuda/` | Custom GPU kernels for inference | You |
+| Tokenizer | `src/tokenizer/` | Vocabulary training and export | Friend |
+| Dataset | `src/dataset/` | Data engineering pipeline | Friend |
 
-- **Module name**:
-- **Path**:
-- **Purpose**:
-- **Owns**:
-- **Depends on**:
-- **Owned by**:
+## 2) Non-source modules
 
-## 2) Example module map
+| Module | Path | Purpose | Owner |
+|--------|------|---------|-------|
+| Configs | `configs/` | All hyperparameters and runtime settings | Shared |
+| Data | `data/` | Raw and intermediate data artifacts | Shared |
+| Scripts | `scripts/` | One-off operational scripts | Shared |
+| Tests | `tests/` | Unit and integration tests | Friend |
+| Benchmarks | `benchmarks/` | Performance measurement | Shared |
+| Experiments | `experiments/` | Per-run artifacts and notes | Shared |
+| Notebooks | `notebooks/` | Exploratory analysis | Shared |
+| Deployment | `deployment/` | Containerization and serving | Shared |
 
-- `api/` - request handling and response formatting.
-- `business/` - domain services and core logic.
-- `storage/` - database repositories and migrations.
-- `workers/` - async/background processing.
+## 3) Dependency direction
 
-## 3) Ownership rules
+```
+src/dataset/  -->  src/training/  -->  src/evaluation/
+                        |                    |
+                        v                    v
+                  src/model/  <------  src/inference/  <--  src/cuda/
+                        ^
+                        |
+                  src/tokenizer/
+```
+
+- `src/model/` is imported by `src/training/` and `src/inference/`.
+- `src/cuda/` is imported only by `src/inference/`.
+- `src/dataset/` and `src/tokenizer/` are imported by `src/training/`.
+- No reverse imports (e.g. `src/model/` must not import `src/training/`).
+
+## 4) Ownership rules
 
 - Each module has a clear owner.
 - Cross-module writes require explicit contracts.
-- Shared abstractions require documented consumers.
-
-## 4) Placement decision guide
-
-Before adding new code:
-
-1. Identify owning module.
-2. Verify dependency direction in `Dependencies.md`.
-3. Follow pattern examples in `Patterns.md` and `Examples.md`.
+- Major decisions go in `docs/Decisions.md` before implementation.
