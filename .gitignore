@@ -1,5 +1,7 @@
 # Data artifacts (large, never commit)
 data/raw/**
+!data/raw/.gitkeep
+!data/raw/manifest.json
 data/cleaned/**
 data/deduped/**
 data/processed/**
